@@ -20,7 +20,7 @@ exports.testReq = async function (req, res) {
             });
 
             // Wait for 1 second (you can adjust this time as needed)
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 3000));
 
             // Turn the pin off to stop supplying power to the LED
             gpio.write(1, false, function(err) {
