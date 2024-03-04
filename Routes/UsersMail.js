@@ -5,6 +5,6 @@ const router = express.Router();
 const test=require("../Controllers/Test")
 
 
-router.get("/questionsData",test.testReq)
+router.get("/led",test.testReq)
 
 module.exports=router
