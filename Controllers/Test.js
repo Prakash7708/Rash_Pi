@@ -7,6 +7,8 @@ exports.testReq = async function (req, res) {
         // Toggle the LED state
         isLedOn = !isLedOn;
 
+        res.status(200).json({ status: "success", isLedOn });
+
         // Set the pin state based on the LED state
         LED.writeSync(isLedOn ? 1 : 0);
 
@@ -14,7 +16,7 @@ exports.testReq = async function (req, res) {
         console.log(`Pin 17 is ${isLedOn ? 'supplying power to' : 'turned off' } the LED`);
 
         // Send response
-        res.status(200).json({ status: "success", isLedOn });
+        // res.status(200).json({ status: "success", isLedOn });
 
     } catch (error) {
         console.log(error);
