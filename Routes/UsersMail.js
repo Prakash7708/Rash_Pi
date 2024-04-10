@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const test=require("../Controllers/Test")
-//const livecam=require("../Controllers/Camera")
+const livecam=require("../Controllers/Camera")
 
 router.get("/led",test.testReq)
 
