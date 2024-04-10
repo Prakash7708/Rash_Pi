@@ -4,7 +4,7 @@ var fs = require("fs");
 var path = require("path");
 
 // Define the folder path
-var folderPath = '/var/app/Rash_Pi';
+var folderPath = '/var/app/Rash_Pi/';
 
 // Create the folder if it doesn't exist
 if (!fs.existsSync(folderPath)) {
