@@ -4,7 +4,7 @@ var fs = require("fs");
 var path = require("path");
 
 // Define the folder path
-var folderPath = '/var/app/Rash_Pi/';
+var folderPath = '/var/app/Rash_Pi/photos';
 
 // Create the folder if it doesn't exist
 if (!fs.existsSync(folderPath)) {
@@ -39,9 +39,9 @@ exports.liveCam = async function (req, res) {
 
     // Print the folder path for debugging
     console.log("Folder Path:", folderPath);
-
+     console.log(Webcam)
     // Capture an image from webcam
-    Webcam.capture(path.join(folderPath, "test_picture"), async function (err, data) {
+    Webcam.capture(path.join(folderPath, "./test_picture"), async function (err, data) {
         if (err) {
             console.error(err);
             res.end();
@@ -53,6 +53,7 @@ exports.liveCam = async function (req, res) {
                     res.end();
                 } else {
                     // Send the image as response
+                    console.log(imageData)
                     res.end(imageData);
                 }
             });
