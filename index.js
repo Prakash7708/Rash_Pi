@@ -4,7 +4,7 @@ const cors = require("cors");
 const path = require('path');
 const dotenv = require("dotenv").config();
 const URL = process.env.DB2;
-const users_mail=require("./Routes/UsersMail");
+const users_mail = require("./Routes/UsersMail");
 const startupIO = require("./app-socket"); // Update the path to your app-socket.js file
 const fs = require('fs');
 
@@ -37,7 +37,7 @@ app.get('/liveStream', function (req, res) {
     });
 
     // Read video file asynchronously and stream it to response
-    const videoFilePath = 'path/to/your/live/stream/file.mp4'; // Replace with the actual path to your live stream file
+    const videoFilePath = '/path/to/your/live/stream/file.mp4'; // Replace with the actual path to your live stream file
     const videoStream = fs.createReadStream(videoFilePath);
     videoStream.pipe(res);
 });
@@ -46,7 +46,7 @@ app.get('/liveStream', function (req, res) {
 
 
 //app.use("/api",login)
-app.use("/api",users_mail);
+app.use("/api", users_mail);
 
 
 app.use((err, req, res, next) => {
@@ -64,8 +64,6 @@ app.use((err, req, res, next) => {
 server.listen(process.env.PORT || 5001, () => {
     console.log("api Running in 5001");
 });
-
-
 
 
 
