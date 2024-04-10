@@ -15,7 +15,7 @@
 
       const startVideoStream = async () => {
         try {
-          const streamUrl = 'http://192.168.153.32:5000/api/livecam'; // Replace with your server IP
+          const streamUrl = 'http://192.168.153.32:5001/api/livecam'; // Replace with your server IP
           const mediaSource = new MediaSource();
           videoElement.src = window.URL.createObjectURL(mediaSource);
           mediaSource.addEventListener('sourceopen', () => {
