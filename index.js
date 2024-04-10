@@ -37,7 +37,8 @@ app.get('/liveStream', function (req, res) {
     });
 
     // Read video file asynchronously and stream it to response
-    const videoFilePath = '/path/to/your/live/stream/file.mp4'; // Replace with the actual path to your live stream file
+    const videoFilePath = '/var/app/Rash_Pi/stream.mp4';
+    // Replace with the actual path to your live stream file
     const videoStream = fs.createReadStream(videoFilePath);
     videoStream.pipe(res);
 });
