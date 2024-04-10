@@ -1,4 +1,4 @@
-const PiCam = require('picam');
+const cv = require('opencv4nodejs');
 
 // Endpoint to stream live video from camera
 exports.liveCam = async function (req, res) {
@@ -9,30 +9,41 @@ exports.liveCam = async function (req, res) {
         'Transfer-Encoding': 'chunked'
     });
 
-    // Create a new instance of PiCam
-    const camera = new PiCam({
-        mode: 'video',
-        output: res, // Pipe video stream to HTTP response
-        width: 1280,
-        height: 720,
-        fps: 30,
-        timeout: 0, // Continuous recording
-        rotation: 0 // Optional: set camera rotation (0, 90, 180, 270)
-    });
+    // Create VideoWriter object to write frames to HTTP response
+    const fps = 30;
+    const width = 1280;
+    const height = 720;
+    const writer = new cv.VideoWriter('output.mp4', cv.VideoWriter.fourcc('MP4V'), fps, new cv.Size(width, height));
 
-    // Start the camera
-    camera.start();
+    // Create VideoCapture object to capture video from camera
+    const cap = new cv.VideoCapture(0); // Adjust device index if necessary
 
-    // Handle client disconnect
-    req.on('close', () => {
-        console.log('Client disconnected');
-        camera.stop(); // Stop the camera when client disconnects
-    });
+    // Start capturing frames
+    let frame;
+    while (true) {
+        frame = cap.read(); // Read frame from camera
+        if (frame.empty) break; // Break loop if frame is empty
+
+        // Write frame to VideoWriter object
+        writer.write(frame);
+
+        // Convert frame to base64-encoded string
+        const frameBuffer = cv.imencode('.jpg', frame).toString('base64');
+
+        // Send frame to client
+        res.write(Buffer.from(frameBuffer, 'base64'));
+
+        // Wait for a short delay to maintain FPS
+        await new Promise(resolve => setTimeout(resolve, 1000 / fps));
+    }
+
+    // Release VideoCapture and VideoWriter objects
+    cap.release();
+    writer.release();
+
+    // End HTTP response
+    res.end();
 };
-
-
-
-
 
 
 
