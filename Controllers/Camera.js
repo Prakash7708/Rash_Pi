@@ -30,6 +30,7 @@ exports.liveCam = async function (req, res) {
   camera.on("read", function (err, timestamp, filename) {
     // Assuming 'filename' contains the path to the captured video file, you can stream it to the response
     const stream = fs.createReadStream(filename);
+    console.log(filename)
     stream.pipe(res);
   });
 
