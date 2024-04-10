@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raspberry Pi Camera Stream</title>
+</head>
+<body>
+  <h1>Raspberry Pi Camera Stream</h1>
+  <video id="videoElement" autoplay controls></video>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const videoElement = document.getElementById('videoElement');
+
+      const startVideoStream = async () => {
+        try {
+          const streamUrl = 'http://<raspberry_pi_ip>:3000/stream'; // Replace with your server IP
+          const mediaSource = new MediaSource();
+          videoElement.src = window.URL.createObjectURL(mediaSource);
+          mediaSource.addEventListener('sourceopen', () => {
+            const sourceBuffer = mediaSource.addSourceBuffer('video/mp4');
+            fetch(streamUrl)
+              .then(response => response.body.pipeTo(new WritableStream({
+                write(chunk) {
+                  sourceBuffer.appendBuffer(chunk);
+                },
+                close() {
+                  mediaSource.endOfStream();
+                }
+              })))
+              .catch(error => console.error('Error fetching stream:', error));
+          });
+        } catch (error) {
+          console.error('Error starting video stream:', error);
+        }
+      };
+
+      startVideoStream();
+    });
+  </script>
+</body>
+</html>
