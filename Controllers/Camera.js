@@ -1,70 +1,54 @@
+// Import necessary modules
+var NodeWebcam = require("node-webcam");
+var fs = require("fs");
 
-const RaspiCam = require("raspicam");
-const express = require("express");
-const fs = require("fs");
-const path = require("path");
+// Default options for capturing image
+var opts = {
+    // Picture related
+    width: 1280,
+    height: 720,
+    quality: 100,
+    // Save shots in memory
+    saveShots: true,
+    // Output type
+    output: "jpeg",
+    // Which camera to use, false for default device
+    device: false,
+    // Logging
+    verbose: false
+};
 
-const app = express();
+// Create webcam instance
+var Webcam = NodeWebcam.create(opts);
 
 // Endpoint to stream live video from camera
 exports.liveCam = async function (req, res) {
-  // Set content type to video/mp4
-  res.setHeader("Content-Type", "video/mp4");
+    // Set content type to image/jpeg
+    res.writeHead(200, { 'Content-Type': 'image/jpeg' });
 
-  // Specify the output folder path
-  const outputFolder = path.join(__dirname, "photos");
-
-  // Ensure the output folder exists
-  if (!fs.existsSync(outputFolder)) {
-    fs.mkdirSync(outputFolder);
-  }
-
-  // Configure RaspiCam options
-  const cameraOpts = {
-    mode: "photo", // Specify mode as "photo" for capturing single photos
-    output: path.join(outputFolder, "photo_%d.jpg"), // Output path and filename with sprintf-style variables
-    // Add other optional options as needed
-    // For example:
-    // width: 640, // Image width
-    // height: 480, // Image height
-    // quality: 85, // Image quality (0 to 100)
-    // timeout: 5000 // Time (in ms) before takes picture and shuts down (if not specified, set to 5s)
-  };
-
-  // Initialize RaspiCam with options
-  const camera = new RaspiCam(cameraOpts);
-
-  // Start the camera
-  camera.start();
-
-  // Listen for the "read" event triggered when each new photo is saved
-  camera.on("read", function (err, timestamp, filename) {
-    // Assuming 'filename' contains the path to the captured photo file, you can stream it to the response
-    const stream = fs.createReadStream(filename);
-    stream.pipe(res);
-  });
-
-  // Error handling
-  camera.on("error", function (err) {
-    console.error("Camera error:", err);
-    res.status(500).send("Camera error occurred");
-  });
-
-  // Cleanup on connection close
-  req.on("close", () => {
-    camera.stop();
-    console.log("Connection closed. Camera stopped.");
-  });
+    // Capture an image from webcam
+    Webcam.capture("test_picture", async function (err, data) {
+        if (err) {
+            console.error(err);
+            res.end();
+        } else {
+            // Read the captured image
+            fs.readFile(data, function (err, imageData) {
+                if (err) {
+                    console.error(err);
+                    res.end();
+                } else {
+                    // Send the image as response
+                    res.end(imageData);
+                }
+            });
+        }
+    });
 };
 
-// Define route for liveCam endpoint
-app.get("/livecam", exports.liveCam);
 
-// Start the server
-const port = 3000;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+
+
 
 
 
