@@ -1,6 +1,15 @@
 // Import necessary modules
 var NodeWebcam = require("node-webcam");
 var fs = require("fs");
+var path = require("path");
+
+// Define the folder path
+var folderPath = '/var/app/Rash_Pi';
+
+// Create the folder if it doesn't exist
+if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath);
+}
 
 // Default options for capturing image
 var opts = {
@@ -15,7 +24,9 @@ var opts = {
     // Which camera to use, false for default device
     device: false,
     // Logging
-    verbose: false
+    verbose: false,
+    // File path to save captured image
+    callbackReturn: "location" // Specify that you want the file location as callback return
 };
 
 // Create webcam instance
@@ -27,7 +38,7 @@ exports.liveCam = async function (req, res) {
     res.writeHead(200, { 'Content-Type': 'image/jpeg' });
 
     // Capture an image from webcam
-    Webcam.capture("test_picture", async function (err, data) {
+    Webcam.capture(path.join(folderPath, "test_picture"), async function (err, data) {
         if (err) {
             console.error(err);
             res.end();
