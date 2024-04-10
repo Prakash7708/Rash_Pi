@@ -9,7 +9,7 @@ exports.liveCam = async function (req, res) {
 
   // Configure RaspiCam options
   const cameraOpts = {
-    mode: "video", // Specify mode as "video"
+    mode: "timelapse", // Specify mode as "video"
     output: "-", // To write to stdout, use '-'
     // Add your additional options here
     w: 640, // Image width
