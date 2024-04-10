@@ -37,6 +37,9 @@ exports.liveCam = async function (req, res) {
     // Set content type to image/jpeg
     res.writeHead(200, { 'Content-Type': 'image/jpeg' });
 
+    // Print the folder path for debugging
+    console.log("Folder Path:", folderPath);
+
     // Capture an image from webcam
     Webcam.capture(path.join(folderPath, "test_picture"), async function (err, data) {
         if (err) {
@@ -56,7 +59,6 @@ exports.liveCam = async function (req, res) {
         }
     });
 };
-
 
 
 
