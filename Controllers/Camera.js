@@ -1,4 +1,4 @@
-const raspividStream = require('raspberry-live-stream');
+const PiCam = require('picam');
 
 // Endpoint to stream live video from camera
 exports.liveCam = async function (req, res) {
@@ -9,18 +9,27 @@ exports.liveCam = async function (req, res) {
         'Transfer-Encoding': 'chunked'
     });
 
-    // Set up Raspberry Pi camera stream
-    const stream = raspividStream();
+    // Create a new instance of PiCam
+    const camera = new PiCam({
+        mode: 'video',
+        output: res, // Pipe video stream to HTTP response
+        width: 1280,
+        height: 720,
+        fps: 30,
+        timeout: 0, // Continuous recording
+        rotation: 0 // Optional: set camera rotation (0, 90, 180, 270)
+    });
 
-    // Pipe video stream to HTTP response
-    stream.pipe(res);
+    // Start the camera
+    camera.start();
 
     // Handle client disconnect
     req.on('close', () => {
         console.log('Client disconnected');
-        stream.end(); // End streaming when client disconnects
+        camera.stop(); // Stop the camera when client disconnects
     });
 };
+
 
 
 
