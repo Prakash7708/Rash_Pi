@@ -7,6 +7,6 @@ const test=require("../Controllers/Test")
 
 router.get("/led",test.testReq)
 
-//router.get("/livecam",livecam.liveCam)
+router.get("/livecam",livecam.liveCam)
 
 module.exports=router

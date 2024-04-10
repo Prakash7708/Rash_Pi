@@ -1,52 +1,50 @@
-const cv = require('opencv4nodejs');
+
+const RaspiCam = require("raspicam");
+
 
 // Endpoint to stream live video from camera
 exports.liveCam = async function (req, res) {
-    // Set content type to video/mp4
-    res.writeHead(200, {
-        'Content-Type': 'video/mp4',
-        'Connection': 'keep-alive',
-        'Transfer-Encoding': 'chunked'
-    });
+  // Set content type to video/mp4
+  res.setHeader("Content-Type", "video/mp4");
 
-    // Create VideoWriter object to write frames to HTTP response
-    const fps = 30;
-    const width = 1280;
-    const height = 720;
-    const writer = new cv.VideoWriter('output.mp4', cv.VideoWriter.fourcc('MP4V'), fps, new cv.Size(width, height));
+  // Configure RaspiCam options
+  const cameraOpts = {
+    mode: "video", // Specify mode as "video"
+    output: "-", // To write to stdout, use '-'
+    // Add your additional options here
+    w: 640, // Image width
+    h: 480, // Image height
+    bitrate: "1000000", // Bitrate in bits per second
+    t: 5000, // Time (in ms) to capture for (5 seconds in this case)
+    fps: 30 // Frames per second
+    // Add more options as needed
+  };
 
-    // Create VideoCapture object to capture video from camera
-    const cap = new cv.VideoCapture(0); // Adjust device index if necessary
+  // Initialize RaspiCam with options
+  const camera = new RaspiCam(cameraOpts);
 
-    // Start capturing frames
-    let frame;
-    while (true) {
-        frame = cap.read(); // Read frame from camera
-        if (frame.empty) break; // Break loop if frame is empty
+  // Start the camera
+  camera.start();
 
-        // Write frame to VideoWriter object
-        writer.write(frame);
+  // Pipe camera output to response stream
+  camera.on("read", function (err, timestamp, filename) {
+    // Assuming 'filename' contains the path to the captured video file, you can stream it to the response
+    const stream = fs.createReadStream(filename);
+    stream.pipe(res);
+  });
 
-        // Convert frame to base64-encoded string
-        const frameBuffer = cv.imencode('.jpg', frame).toString('base64');
+  // Error handling
+  camera.on("error", function (err) {
+    console.error("Camera error:", err);
+    res.status(500).send("Camera error occurred");
+  });
 
-        // Send frame to client
-        res.write(Buffer.from(frameBuffer, 'base64'));
-
-        // Wait for a short delay to maintain FPS
-        await new Promise(resolve => setTimeout(resolve, 1000 / fps));
-    }
-
-    // Release VideoCapture and VideoWriter objects
-    cap.release();
-    writer.release();
-
-    // End HTTP response
-    res.end();
+  // Cleanup on connection close
+  req.on("close", () => {
+    camera.stop();
+    console.log("Connection closed. Camera stopped.");
+  });
 };
-
-
-
 
 
 
