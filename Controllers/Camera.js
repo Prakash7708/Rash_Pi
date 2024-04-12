@@ -1,13 +1,49 @@
-
-
-
+const ffmpeg = require('fluent-ffmpeg');
+const NodeMediaServer = require('node-media-server');
 
 // Endpoint to stream live video from camera
 exports.liveCam = async function (req, res) {
     try {
-        
+        // Set up ffmpeg to capture video from /dev/video0
+        const ffmpegCommand = ffmpeg('/dev/video0')
+            .inputOptions('-f v4l2')
+            .inputFormat('v4l2')
+            .outputOptions('-preset ultrafast')
+            .outputFormat('flv')
+            .on('start', function() {
+                console.log('FFmpeg started');
+            })
+            .on('end', function() {
+                console.log('FFmpeg ended');
+            })
+            .on('error', function(err) {
+                console.error('FFmpeg error:', err);
+            });
+
+        // Create a NodeMediaServer instance to serve the stream over HTTP
+        const config = {
+            rtmp: {
+                port: 1935,
+                chunk_size: 60000,
+                gop_cache: true,
+                ping: 30,
+                ping_timeout: 60
+            },
+            http: {
+                port: 8000,
+                mediaroot: './media',
+                allow_origin: '*'
+            }
+        };
+
+        const nms = new NodeMediaServer(config);
+        nms.run();
+
+        // Redirect ffmpeg output to NodeMediaServer
+        ffmpegCommand.pipe(res, { end: true });
     } catch (error) {
-        
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
     }
 };
 
