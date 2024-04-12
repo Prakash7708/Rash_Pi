@@ -49,7 +49,7 @@ function captureImage() {
 
 // Function to send the captured image as a response
 function sendImage(res) {
-    const imagePath = path.join(folderPath, "./test_picture");
+    const imagePath = path.join(folderPath, "./test_picture.jpg");
     fs.readFile(imagePath, function (err, imageData) {
         if (err) {
             console.error("Error reading image file:", err);
