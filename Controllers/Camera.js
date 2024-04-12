@@ -11,7 +11,7 @@ if (!fs.existsSync(folderPath)) {
     fs.mkdirSync(folderPath);
 }
 
-// Default options for capturing image
+/// Default options for capturing image
 var opts = {
     // Picture related
     width: 1280,
@@ -28,9 +28,10 @@ var opts = {
     // File path to save captured image
     callbackReturn: "location", // Specify that you want the file location as callback return
     // Add options to increase capturing speed
-    interval: 0, // Set interval between captures to 0 milliseconds (capture as fast as possible)
-    loop: false // Set loop to false to capture only once
+    interval: 100, // Set interval between captures to 100 milliseconds (capture approximately 10 fps)
+    loop: true // Set loop to true to capture continuously
 };
+
 
 // Create webcam instance with modified options
 var Webcam = NodeWebcam.create(opts);
