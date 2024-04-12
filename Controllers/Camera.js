@@ -14,9 +14,9 @@ if (!fs.existsSync(folderPath)) {
 // Default options for capturing image
 var opts = {
     // Picture related
-    width: 1280,
-    height: 720,
-    quality: 100,
+    width: 320, // Further reduced width
+    height: 240, // Further reduced height
+    quality: 20, // Further reduced quality
     // Save shots in memory
     saveShots: true,
     // Output type
@@ -31,6 +31,26 @@ var opts = {
     interval: 10, // Set interval between captures to 10 milliseconds
     loop: true // Set loop to true to capture continuously
 };
+
+// var opts = {
+//     // Picture related
+//     width: 1280,
+//     height: 720,
+//     quality: 100,
+//     // Save shots in memory
+//     saveShots: true,
+//     // Output type
+//     output: "jpeg",
+//     // Which camera to use, false for default device
+//     device: false,
+//     // Logging
+//     verbose: false,
+//     // File path to save captured image
+//     callbackReturn: "location", // Specify that you want the file location as callback return
+//     // Add options to increase capturing speed
+//     interval: 10, // Set interval between captures to 10 milliseconds
+//     loop: true // Set loop to true to capture continuously
+// };
 
 // Create webcam instance with modified options
 var Webcam = NodeWebcam.create(opts);
