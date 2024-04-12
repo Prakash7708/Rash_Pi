@@ -8,7 +8,7 @@ var folderPath = '/var/app/Rash_Pi/photos';
 
 // Create the folder if it doesn't exist
 if (!fs.existsSync(folderPath)) {
-    fs.mkdirSync(folderPath);
+    fs.mkdirSync(folderPath, { recursive: true }); // Use recursive option to create parent directories if they don't exist
 }
 
 // Default options for capturing image
@@ -40,9 +40,9 @@ function captureImage() {
     // Capture an image from webcam
     Webcam.capture(path.join(folderPath, "./test_picture"), async function (err, data) {
         if (err) {
-            console.error(err);
+            console.error("Error capturing image:", err);
         } else {
-            console.log("Image captured...");
+            console.log("Image captured:", data);
         }
     });
 }
@@ -52,8 +52,9 @@ function sendImage(res) {
     const imagePath = path.join(folderPath, "./test_picture");
     fs.readFile(imagePath, function (err, imageData) {
         if (err) {
-            console.error(err);
-            res.end();
+            console.error("Error reading image file:", err);
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end("Internal Server Error");
         } else {
             // Set content type to image/jpeg
             res.writeHead(200, { 'Content-Type': 'image/jpeg' });
@@ -72,7 +73,6 @@ exports.liveCam = async function (req, res) {
     // Call the function to send the captured image as a response
     sendImage(res);
 };
-
 
 
 
