@@ -16,7 +16,7 @@ var opts = {
     // Picture related
     width: 320, // Further reduced width
     height: 240, // Further reduced height
-    quality: 20, // Further reduced quality
+    quality: 60, // Further reduced quality
     // Save shots in memory
     saveShots: true,
     // Output type
