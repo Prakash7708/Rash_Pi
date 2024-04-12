@@ -66,7 +66,7 @@ function sendImage(res) {
 }
 
 // Call captureImage function to start capturing images
-setInterval(captureImage, 10);
+setInterval(captureImage, 50);
 
 // Endpoint to stream live video from camera
 exports.liveCam = async function (req, res) {
