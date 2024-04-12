@@ -11,7 +11,7 @@ if (!fs.existsSync(folderPath)) {
     fs.mkdirSync(folderPath);
 }
 
-/// Default options for capturing image
+// Default options for capturing image
 var opts = {
     // Picture related
     width: 1280,
@@ -32,18 +32,11 @@ var opts = {
     loop: true // Set loop to true to capture continuously
 };
 
-
 // Create webcam instance with modified options
 var Webcam = NodeWebcam.create(opts);
 
-// Endpoint to stream live video from camera
-exports.liveCam = async function (req, res) {
-    // Set content type to image/jpeg
-    res.writeHead(200, { 'Content-Type': 'image/jpeg' });
-
-    // Print the folder path for debugging
-    console.log("Folder Path:", folderPath);
-
+// Function to capture a new image and send it as a response
+function captureAndSendImage(res) {
     // Capture an image from webcam
     Webcam.capture(path.join(folderPath, "./test_picture"), async function (err, data) {
         if (err) {
@@ -57,13 +50,106 @@ exports.liveCam = async function (req, res) {
                     res.end();
                 } else {
                     // Send the image as response
-                    console.log(imageData)
-                    res.end(imageData);
+                    res.write(imageData);
+                    setTimeout(() => captureAndSendImage(res), 100); // Capture and send a new image every 100 milliseconds
                 }
             });
         }
     });
+}
+
+// Endpoint to stream live video from camera
+exports.liveCam = async function (req, res) {
+    // Set content type to image/jpeg
+    res.writeHead(200, { 'Content-Type': 'image/jpeg' });
+
+    // Call the function to capture and send an image
+    captureAndSendImage(res);
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // Import necessary modules
+// var NodeWebcam = require("node-webcam");
+// var fs = require("fs");
+// var path = require("path");
+
+// // Define the folder path
+// var folderPath = '/var/app/Rash_Pi/photos';
+
+// // Create the folder if it doesn't exist
+// if (!fs.existsSync(folderPath)) {
+//     fs.mkdirSync(folderPath);
+// }
+
+// /// Default options for capturing image
+// var opts = {
+//     // Picture related
+//     width: 1280,
+//     height: 720,
+//     quality: 100,
+//     // Save shots in memory
+//     saveShots: true,
+//     // Output type
+//     output: "jpeg",
+//     // Which camera to use, false for default device
+//     device: false,
+//     // Logging
+//     verbose: false,
+//     // File path to save captured image
+//     callbackReturn: "location", // Specify that you want the file location as callback return
+//     // Add options to increase capturing speed
+//     interval: 100, // Set interval between captures to 100 milliseconds (capture approximately 10 fps)
+//     loop: true // Set loop to true to capture continuously
+// };
+
+
+// // Create webcam instance with modified options
+// var Webcam = NodeWebcam.create(opts);
+
+// // Endpoint to stream live video from camera
+// exports.liveCam = async function (req, res) {
+//     // Set content type to image/jpeg
+//     res.writeHead(200, { 'Content-Type': 'image/jpeg' });
+
+//     // Print the folder path for debugging
+//     console.log("Folder Path:", folderPath);
+
+//     // Capture an image from webcam
+//     Webcam.capture(path.join(folderPath, "./test_picture"), async function (err, data) {
+//         if (err) {
+//             console.error(err);
+//             res.end();
+//         } else {
+//             // Read the captured image
+//             fs.readFile(data, function (err, imageData) {
+//                 if (err) {
+//                     console.error(err);
+//                     res.end();
+//                 } else {
+//                     // Send the image as response
+//                     console.log(imageData)
+//                     res.end(imageData);
+//                 }
+//             });
+//         }
+//     });
+// };
 
 
 

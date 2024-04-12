@@ -20,11 +20,11 @@
         var img = document.getElementById('live-video');
         function updateImage() {
             // Append a random number to the image URL to prevent caching
-            img.src = 'http://192.168.82.33:5001/api/livecam?' + Math.random();
+            //img.src = 'http://192.168.82.33:5001/api/livecam?' + Math.random();
         }
 
         // Call updateImage function every second
-        setInterval(updateImage, 1500);
+        setInterval(updateImage, 1200);
     </script>
 </body>
 </html>
