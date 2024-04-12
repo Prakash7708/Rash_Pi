@@ -28,7 +28,7 @@ var opts = {
     // File path to save captured image
     callbackReturn: "location", // Specify that you want the file location as callback return
     // Add options to increase capturing speed
-    interval: 100, // Set interval between captures to 100 milliseconds (capture approximately 10 fps)
+    interval: 10, // Set interval between captures to 10 milliseconds
     loop: true // Set loop to true to capture continuously
 };
 
@@ -36,36 +36,43 @@ var opts = {
 var Webcam = NodeWebcam.create(opts);
 
 // Function to capture a new image and send it as a response
-function captureAndSendImage(res) {
+function captureImage() {
     // Capture an image from webcam
     Webcam.capture(path.join(folderPath, "./test_picture"), async function (err, data) {
         if (err) {
             console.error(err);
-            res.end();
         } else {
-            // Read the captured image
-            fs.readFile(data, function (err, imageData) {
-                if (err) {
-                    console.error(err);
-                    res.end();
-                } else {
-                    // Send the image as response
-                    res.write(imageData);
-                    setTimeout(() => captureAndSendImage(res), 100); // Capture and send a new image every 100 milliseconds
-                }
-            });
+            console.log("Image captured...");
         }
     });
 }
 
+// Function to send the captured image as a response
+function sendImage(res) {
+    const imagePath = path.join(folderPath, "./test_picture");
+    fs.readFile(imagePath, function (err, imageData) {
+        if (err) {
+            console.error(err);
+            res.end();
+        } else {
+            // Set content type to image/jpeg
+            res.writeHead(200, { 'Content-Type': 'image/jpeg' });
+            // Send the image as response
+            res.write(imageData);
+            res.end();
+        }
+    });
+}
+
+// Call captureImage function to start capturing images
+setInterval(captureImage, 10);
+
 // Endpoint to stream live video from camera
 exports.liveCam = async function (req, res) {
-    // Set content type to image/jpeg
-    res.writeHead(200, { 'Content-Type': 'image/jpeg' });
-
-    // Call the function to capture and send an image
-    captureAndSendImage(res);
+    // Call the function to send the captured image as a response
+    sendImage(res);
 };
+
 
 
 
