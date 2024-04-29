@@ -7,6 +7,6 @@ const livecam=require("../Controllers/Camera")
 
 router.get("/led",test.testReq)
 
-router.get("/livecam",livecam.liveCam)
+//router.get("/livecam",livecam.liveCam)
 
 module.exports=router

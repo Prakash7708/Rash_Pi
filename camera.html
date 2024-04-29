@@ -23,18 +23,18 @@
 </head>
 <body>
     <h1>Live Video Stream</h1>
-    <img id="live-video" src="http://192.168.82.33:5001/api/livecam" alt="Live Video Stream">
+    <img id="live-video" src="https://ddfea7461a5e5159ca8304cbfeaf4f18.serveo.net/api/livecam" alt="Live Video Stream">
 
     <script>
         // Function to update the image source every second
         var img = document.getElementById('live-video');
         function updateImage() {
             // Append a random number to the image URL to prevent caching
-            img.src = 'http://192.168.82.33:5001/api/livecam?' + Math.random();
+            img.src = 'http://192.168.109.32:5001/api/livecam?' + Math.random();
         }
 
         // Call updateImage function every second
-        setInterval(updateImage, 200);
+        setInterval(updateImage, 700);
     </script>
 </body>
 </html>

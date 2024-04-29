@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Webcam Stream</title>
+</head>
+<body>
+    <!-- <img src="https://0747a530499ea7607a6047f65db69652.serveo.net/?action=stream" width="640" height="480">
+    -->
+    <img src="http://192.168.113.32:8080/?action=stream" width="640" height="480">
+    <button id="getRequestBtn">Make GET Request</button>
+
+    <script>
+        // Function to make a GET request
+        function makeGetRequest() {
+            // Make the GET request here
+            // Example: You can use fetch API to make the request
+            fetch('http://192.168.109.32:5001/api/led')
+                .then(response => {
+                    // Handle response here
+                })
+                .catch(error => {
+                    // Handle error here
+                });
+        }
+
+        // Add click event listener to the button
+        document.getElementById('getRequestBtn').addEventListener('click', makeGetRequest);
+    </script>
+</body>
+</html>
