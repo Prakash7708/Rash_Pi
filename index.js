@@ -24,22 +24,22 @@ app.use(
 //app.use("/api",login)
 app.use("/api",users_mail)
 
-const { Gpio } = require('onoff');
-const in1 = new Gpio(22, 'out');
-const in2 = new Gpio(27, 'out');
+// const { Gpio } = require('onoff');
+// const in1 = new Gpio(22, 'out');
+// const in2 = new Gpio(27, 'out');
 
-// Test motor forward
-in1.writeSync(1);
-in2.writeSync(0);
+// // Test motor forward
+// in1.writeSync(1);
+// in2.writeSync(0);
 
-// Wait for 5 seconds
-setTimeout(() => {
-    in1.writeSync(0);
-    in2.writeSync(0);
-    in1.unexport();
-    in2.unexport();
-    console.log("motor off")
-}, 5000);
+// // Wait for 5 seconds
+// setTimeout(() => {
+//     in1.writeSync(0);
+//     in2.writeSync(0);
+//     in1.unexport();
+//     in2.unexport();
+//     console.log("motor off")
+// }, 5000);
 
 
 app.use((err, req, res, next) => {
