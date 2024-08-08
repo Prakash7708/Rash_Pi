@@ -54,8 +54,10 @@ exports.testReq = async function (req, res) {
         // Set the motor state based on the isMotorOn value
         if (isMotorOn) {
             motorForward();
+            console.log("motor on")
         } else {
             motorStop();
+            console.log("motor off")
         }
 
         res.status(200).json({ status: "success", isMotorOn });
