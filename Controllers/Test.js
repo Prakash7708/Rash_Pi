@@ -36,6 +36,7 @@ let isMotorOn = false;
 
 // Function to drive motor forward
 function motorForward() {
+    console.log('forward')
     in1.writeSync(1);
     in2.writeSync(0);
 }
