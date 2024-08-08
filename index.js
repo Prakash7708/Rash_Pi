@@ -26,54 +26,37 @@ app.use("/api",users_mail)
 
 
 
-
-const pigpio = require('pigpio');
-const Gpio = pigpio.Gpio;
-
-// Initialize GPIO pins for PWM
-const in1 = new Gpio(22, { mode: Gpio.OUTPUT });
-const in2 = new Gpio(27, { mode: Gpio.OUTPUT });
-const en = new Gpio(25, { mode: Gpio.OUTPUT });
-
-// Set PWM frequency (optional, adjust as needed)
-en.pwmFrequency(1000);
-
-// Function to set motor speed
-function setSpeed(dutyCycle) {
-    en.pwmWrite(dutyCycle); // dutyCycle is a value between 0 (0%) and 255 (100%)
-}
-
-// Example to run the motor at 33% duty cycle
-setSpeed(85); // Approximately 33% of 255
-
-// Run motor forward
-in1.digitalWrite(1);
-in2.digitalWrite(0);
+// 
+// 
 
 
 
 
 
 
+const { Gpio } = require('onoff');
+const in1 = new Gpio(22, 'out');
+const in2 = new Gpio(27, 'out');
+
+// Test motor forward
+in1.writeSync(1);
+in2.writeSync(0);
+
+// Wait for 5 seconds
+setTimeout(() => {
+    in1.writeSync(0);
+    in2.writeSync(0);
+    in1.unexport();
+    in2.unexport();
+    console.log("motor off")
+}, 5000);
 
 
 
-// const { Gpio } = require('onoff');
-// const in1 = new Gpio(22, 'out');
-// const in2 = new Gpio(27, 'out');
 
-// // Test motor forward
-// in1.writeSync(1);
-// in2.writeSync(0);
 
-// // Wait for 5 seconds
-// setTimeout(() => {
-//     in1.writeSync(0);
-//     in2.writeSync(0);
-//     in1.unexport();
-//     in2.unexport();
-//     console.log("motor off")
-// }, 5000);
+
+
 
 // const Gpio = require('onoff').Gpio;
 // const readline = require('readline');
