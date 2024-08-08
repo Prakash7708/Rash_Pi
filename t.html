@@ -4,9 +4,11 @@
     <title>Webcam Stream</title>
 </head>
 <body>
-    <!-- <img src="https://0747a530499ea7607a6047f65db69652.serveo.net/?action=stream" width="640" height="480">
+    <!-- <img src="https://7b59-2409-40f4-38-61f4-ba27-ebff-fe9b-b902.ngrok-free.app" width="640" height="480">
     -->
-    <img src="http://192.168.113.32:8080/?action=stream" width="640" height="480">
+   
+    <img src="http://192.168.119.32:8080/?action=stream" width="640" height="480">
+    
     <button id="getRequestBtn">Make GET Request</button>
 
     <script>
@@ -14,7 +16,7 @@
         function makeGetRequest() {
             // Make the GET request here
             // Example: You can use fetch API to make the request
-            fetch('http://192.168.109.32:5001/api/led')
+            fetch('https://b01266f171145b19d1e71131cbcfd484.serveo.net/api/led')
                 .then(response => {
                     // Handle response here
                 })

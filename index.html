@@ -1,103 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LED Control</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: black;
-        }
-        .container {
-            text-align: center;
-        }
-        #ledBtn {
-            padding: 20px 40px;
-            font-size: 20px;
-            cursor: pointer;
-            background-color: #4CAF50; /* Green */
-            border: none;
-            color: white;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        }
-        #ledBtn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 12px 40px 0 rgba(0, 0, 0, 0.19);
-        }
-        #ledBtn:active {
-            transform: scale(0.9);
-        }
-        .glow {
-            animation: glow 1s infinite alternate;
-        }
-        @keyframes glow {
-            0% {box-shadow: 0 0 10px #4CAF50, 0 0 20px #4CAF50, 0 0 30px #4CAF50, 0 0 40px #4CAF50, 0 0 70px #4CAF50, 0 0 80px #4CAF50, 0 0 100px #4CAF50, 0 0 150px #4CAF50;}
-            100% {box-shadow: 0 0 20px #4CAF50, 0 0 30px #4CAF50, 0 0 40px #4CAF50, 0 0 50px #4CAF50, 0 0 70px #4CAF50, 0 0 80px #4CAF50, 0 0 100px #4CAF50, 0 0 150px #4CAF50;}
-        }
-        .glass {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 12px;
-        }
-    </style>
+    <title>Webcam Stream</title>
 </head>
 <body>
+    <!-- <img src="https://7b59-2409-40f4-38-61f4-ba27-ebff-fe9b-b902.ngrok-free.app/?action=stream" width="640" height="480">
+    -->
+   
+    <img src="http://192.168.30.32:8080/?action=stream" width="640" height="480">
+    
+    <button id="getRequestBtn">Make GET Request</button>
 
-<div class="container">
-    <h1 style="color: white;">LED Control</h1>
-    <label for="apiInput" style="color: white;">API URL:</label>
-    <input type="text" id="apiInput" value="https://973610bdf1c527aa11b577c61501c76a.serveo.net/api/led" style="margin-bottom: 10px;">
-    <br>
-    <button id="ledBtn" class="glass">Turn LED On/Off</button>
-</div>
-
-<script>
-    const ledBtn = document.getElementById('ledBtn');
-    const apiInput = document.getElementById('apiInput');
-
-    // Function to toggle button state
-    function toggleButton(isLedOn) {
-        if (isLedOn) {
-            ledBtn.classList.add('glow');
-        } else {
-            ledBtn.classList.remove('glow');
+    <script>
+        // Function to make a GET request
+        function makeGetRequest() {
+            // Make the GET request here
+            // Example: You can use fetch API to make the request
+            fetch('http://192.168.30.32:5001/api/led')
+            //fetch('https://b01266f171145b19d1e71131cbcfd484.serveo.net/api/led')
+                .then(response => {
+                    // Handle response here
+                })
+                .catch(error => {
+                    // Handle error here
+                });
         }
-    }
 
-    ledBtn.addEventListener('click', () => {
-        // Make a GET request to control the LED
-        const apiUrl = apiInput.value.trim();
-        fetch(apiUrl, {
-            method: 'GET',
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Log the response from the server
-            console.log(data);
-            // Toggle button based on LED status
-            toggleButton(data.isLedOn);
-        })
-        .catch(error => {
-            // Handle errors
-            console.error('There was a problem with the fetch operation:', error);
-        });
-    });
-</script>
-
+        // Add click event listener to the button
+        document.getElementById('getRequestBtn').addEventListener('click', makeGetRequest);
+    </script>
 </body>
 </html>
