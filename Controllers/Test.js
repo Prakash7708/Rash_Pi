@@ -2,7 +2,7 @@ const { Gpio } = require('onoff'); // Include onoff to interact with the GPIO
 const LED = new Gpio(17, 'out'); // Use GPIO pin 17 and specify that it is output
 let isLedOn = false; // Variable to track the LED state
 
-exports.testReq_0 = async function (req, res) {
+exports.testReq= async function (req, res) {
     try {
         // Toggle the LED state
         isLedOn = !isLedOn;
