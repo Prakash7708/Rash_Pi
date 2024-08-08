@@ -65,8 +65,8 @@ exports.testReq = async function (req, res) {
 };
 
 // Cleanup GPIO on exit
-process.on('SIGINT', () => {
-    in1.unexport();
-    in2.unexport();
-    process.exit();
-});
+// process.on('SIGINT', () => {
+//     in1.unexport();
+//     in2.unexport();
+//     process.exit();
+// });
