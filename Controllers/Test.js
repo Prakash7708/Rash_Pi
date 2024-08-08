@@ -54,10 +54,12 @@ exports.testReq = async function (req, res) {
 
         // Set the motor state based on the isMotorOn value
         if (isMotorOn) {
-            motorForward();
+           // motorForward();
+           in1.writeSync(1);
+           in2.writeSync(0);
             console.log("motor on")
         } else {
-            motorStop();
+            //motorStop();
             console.log("motor off")
         }
 

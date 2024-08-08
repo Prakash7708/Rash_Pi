@@ -41,6 +41,113 @@ app.use("/api",users_mail)
 //     console.log("motor off")
 // }, 5000);
 
+const Gpio = require('onoff').Gpio;
+const readline = require('readline');
+
+// Define GPIO pins
+const in1 = new Gpio(22, 'out'); // Use GPIO 22 for IN1 on L298N
+const in2 = new Gpio(27, 'out'); // Use GPIO 27 for IN2 on L298N
+const en = new Gpio(25, 'out');  // Use GPIO 25 for EN on L298N
+
+// Set initial state
+let temp1 = 1; // Motor direction (1 for forward, 0 for backward)
+
+// Create an interface for reading input
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+// Function to set motor speed
+function setSpeed(dutyCycle) {
+    // PWM is not natively supported in 'onoff', you need another library like 'pigpio' for PWM control
+    console.log(`Speed set to ${dutyCycle}%`);
+}
+
+// Function to control motor direction and state
+function controlMotor(command) {
+    switch(command) {
+        case 'r':
+            console.log('Run');
+            if(temp1 === 1) {
+                in1.writeSync(1);
+                in2.writeSync(0);
+                console.log('Forward');
+            } else {
+                in1.writeSync(0);
+                in2.writeSync(1);
+                console.log('Backward');
+            }
+            break;
+        case 's':
+            console.log('Stop');
+            in1.writeSync(0);
+            in2.writeSync(0);
+            break;
+        case 'f':
+            console.log('Forward');
+            in1.writeSync(1);
+            in2.writeSync(0);
+            temp1 = 1;
+            break;
+        case 'b':
+            console.log('Backward');
+            in1.writeSync(0);
+            in2.writeSync(1);
+            temp1 = 0;
+            break;
+        case 'l':
+            console.log('Low');
+            setSpeed(25);
+            break;
+        case 'm':
+            console.log('Medium');
+            setSpeed(50);
+            break;
+        case 'h':
+            console.log('High');
+            setSpeed(75);
+            break;
+        case 'e':
+            console.log('Exiting and cleaning up GPIO');
+            in1.unexport();
+            in2.unexport();
+            en.unexport();
+            process.exit();
+        default:
+            console.log('<<< Wrong data >>>');
+            console.log('Please enter the defined data to continue...');
+    }
+}
+
+// Prompt user for input and control the motor
+function promptUser() {
+    rl.question('Enter command (r-run, s-stop, f-forward, b-backward, l-low, m-medium, h-high, e-exit): ', (input) => {
+        controlMotor(input.toLowerCase().trim());
+        promptUser();
+    });
+}
+
+promptUser();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.use((err, req, res, next) => {
     const errorStatus = err.status || 500;
