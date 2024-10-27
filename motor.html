@@ -33,6 +33,7 @@
                 .then(data => {
                     const statusDisplay1 = document.getElementById('statusDisplay1');
                     if (data.status === "success") {
+                        // Use the specific key for Motor 1 status
                         if (data.isMotor1On) {
                             statusDisplay1.textContent = "Motor 1 status: Running";
                             statusDisplay1.style.color = "green";
@@ -60,6 +61,7 @@
                 .then(data => {
                     const statusDisplay2 = document.getElementById('statusDisplay2');
                     if (data.status === "success") {
+                        // Use the specific key for Motor 2 status
                         if (data.isMotor2On) {
                             statusDisplay2.textContent = "Motor 2 status: Running";
                             statusDisplay2.style.color = "green";

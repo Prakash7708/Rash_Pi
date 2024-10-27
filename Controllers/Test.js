@@ -71,6 +71,7 @@ exports.testReq = async function (req, res) {
         isMotor1On = !isMotor1On;
         isMotor2On = !isMotor2On;
 
+        // Control Motor 1 based on state
         if (isMotor1On) {
             motor1Forward();
             console.log("Motor 1 on");
@@ -79,6 +80,7 @@ exports.testReq = async function (req, res) {
             console.log("Motor 1 off");
         }
 
+        // Control Motor 2 based on state
         if (isMotor2On) {
             motor2Forward();
             console.log("Motor 2 on");
@@ -87,7 +89,8 @@ exports.testReq = async function (req, res) {
             console.log("Motor 2 off");
         }
 
-        res.status(200).json({ status: "success", isMotor1On, isMotor2On });
+        // Send response with both motor statuses
+        res.status(200).json({ status: "success", motorStatus: { isMotor1On, isMotor2On } });
     } catch (error) {
         console.log(error);
         res.status(500).json({ status: "failure", message: "Failed to control GPIO pins" });
@@ -102,7 +105,6 @@ process.on('SIGINT', () => {
     in4.unexport();
     process.exit();
 });
-
 
 
 
