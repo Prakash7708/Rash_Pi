@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoseNet Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        canvas {
+            border: 1px solid black;
+            position: relative;
+        }
+        #results {
+            display: flex;
+            flex-direction: column;
+            margin-left: 20px; /* Space between canvas and results */
+        }
+        .result-item {
+            margin: 5px 0; /* Spacing between each result */
+        }
+    </style>
+</head>
+<body>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="output" width="640" height="480"></canvas>
+    <div id="results">
+        <div class="result-item" id="headUpDown">Head Up/Down Motor: 0%</div>
+        <div class="result-item" id="headRotation">Head Rotation Motor: 0%</div>
+        <div class="result-item" id="leftShoulder">Left Shoulder Motor Rotation: 0%</div>
+        <div class="result-item" id="rightShoulder">Right Shoulder Motor Rotation: 0%</div>
+        <div class="result-item" id="elbow">Elbow Motor Rotation: 0%</div>
+        <div class="result-item" id="hip">Hip Motor Rotation: 0%</div>
+        <div class="result-item" id="leftShoulderAngles">Left Shoulder Angles: N/A</div>
+        <div class="result-item" id="rightShoulderAngles">Right Shoulder Angles: N/A</div>
+    </div>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('output');
+        const ctx = canvas.getContext('2d');
+
+        // Set up video stream
+        navigator.mediaDevices.getUserMedia({
+            video: true
+        }).then(stream => {
+            video.srcObject = stream;
+        });
+
+        // Function to draw the skeleton
+        function drawSkeleton(keypoints) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawings
+
+            // Draw keypoints
+            keypoints.forEach(({ score, position }) => {
+                if (score > 0.5) { // Only draw keypoints with a score above 0.5
+                    ctx.beginPath();
+                    ctx.arc(position.x, position.y, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'red';
+                    ctx.fill();
+                }
+            });
+
+            // Draw skeleton lines between keypoints
+            const adjacentKeyPoints = posenet.getAdjacentKeyPoints(keypoints, 0.5);
+            adjacentKeyPoints.forEach(([a, b]) => {
+                if (a.score > 0.5 && b.score > 0.5) {
+                    ctx.beginPath();
+                    ctx.moveTo(a.position.x, a.position.y);
+                    ctx.lineTo(b.position.x, b.position.y);
+                    ctx.strokeStyle = 'blue';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            });
+        }
+
+        // Function to calculate angle between three points
+        function calculateAngle(a, b, c) {
+            const ab = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+            const bc = Math.sqrt(Math.pow(c.x - b.x, 2) + Math.pow(c.y - b.y, 2));
+            const ac = Math.sqrt(Math.pow(c.x - a.x, 2) + Math.pow(c.y - a.y, 2));
+
+            const angle = Math.acos((ab * ab + bc * bc - ac * ac) / (2 * ab * bc));
+            return angle * (180 / Math.PI); // Convert radians to degrees
+        }
+
+        // Function to update the results display
+        function updateResults(keypoints) {
+            const head = keypoints.find(kp => kp.part === 'nose');
+            const leftShoulder = keypoints.find(kp => kp.part === 'leftShoulder');
+            const leftElbow = keypoints.find(kp => kp.part === 'leftElbow');
+            const leftWrist = keypoints.find(kp => kp.part === 'leftWrist');
+            const rightShoulder = keypoints.find(kp => kp.part === 'rightShoulder');
+            const rightElbow = keypoints.find(kp => kp.part === 'rightElbow');
+            const rightWrist = keypoints.find(kp => kp.part === 'rightWrist');
+            const hip = keypoints.find(kp => kp.part === 'leftHip');
+
+            // Update Head Up/Down Motor
+            if (head) {
+                const headUpDown = ((head.position.y / canvas.height) * 100).toFixed(1); // Up/Down percentage
+                document.getElementById('headUpDown').innerText = `Head Up/Down Motor: ${headUpDown}%`;
+            } else {
+                document.getElementById('headUpDown').innerText = 'Head Up/Down Motor: Not Detected';
+            }
+
+            // Update Head Rotation Motor
+            if (head) {
+                const headRotation = ((head.position.x / canvas.width) * 100).toFixed(1); // Rotation percentage
+                document.getElementById('headRotation').innerText = `Head Rotation Motor: ${headRotation}%`;
+            } else {
+                document.getElementById('headRotation').innerText = 'Head Rotation Motor: Not Detected';
+            }
+
+            // Update Left Shoulder Rotation
+            if (leftShoulder) {
+                document.getElementById('leftShoulder').innerText = `Left Shoulder Motor Rotation: ${leftShoulder.score > 0.5 ? (leftShoulder.position.y / canvas.height * 100).toFixed(1) : 'Not Detected'}`;
+            } else {
+                document.getElementById('leftShoulder').innerText = 'Left Shoulder Motor Rotation: Not Detected';
+            }
+
+            // Update Right Shoulder Rotation
+            if (rightShoulder) {
+                document.getElementById('rightShoulder').innerText = `Right Shoulder Motor Rotation: ${rightShoulder.score > 0.5 ? (rightShoulder.position.y / canvas.height * 100).toFixed(1) : 'Not Detected'}`;
+            } else {
+                document.getElementById('rightShoulder').innerText = 'Right Shoulder Motor Rotation: Not Detected';
+            }
+
+            // Update Elbow Rotation
+            if (leftElbow) {
+                document.getElementById('elbow').innerText = `Elbow Motor Rotation: ${leftElbow.score > 0.5 ? (leftElbow.position.y / canvas.height * 100).toFixed(1) : 'Not Detected'}`;
+            } else {
+                document.getElementById('elbow').innerText = 'Elbow Motor Rotation: Not Detected';
+            }
+
+            // Update Hip Rotation
+            if (hip) {
+                document.getElementById('hip').innerText = `Hip Motor Rotation: ${hip.score > 0.5 ? (hip.position.y / canvas.height * 100).toFixed(1) : 'Not Detected'}`;
+            } else {
+                document.getElementById('hip').innerText = 'Hip Motor Rotation: Not Detected';
+            }
+
+            // Update Left Shoulder Angles
+            if (leftShoulder && leftElbow && leftWrist) {
+                const leftAngle1 = calculateAngle(leftShoulder.position, leftElbow.position, leftWrist.position).toFixed(1);
+                const leftAngle2 = calculateAngle(leftElbow.position, leftWrist.position, hip.position ? hip.position : leftShoulder.position).toFixed(1);
+                const leftAngle3 = calculateAngle(leftShoulder.position, leftWrist.position, hip.position ? hip.position : leftShoulder.position).toFixed(1);
+
+                document.getElementById('leftShoulderAngles').innerText = `Left Shoulder Angles: ${leftAngle1}°, ${leftAngle2}°, ${leftAngle3}°`;
+            } else {
+                document.getElementById('leftShoulderAngles').innerText = 'Left Shoulder Angles: Not Detected';
+            }
+
+            // Update Right Shoulder Angles
+            if (rightShoulder && rightElbow && rightWrist) {
+                const rightAngle1 = calculateAngle(rightShoulder.position, rightElbow.position, rightWrist.position).toFixed(1);
+                const rightAngle2 = calculateAngle(rightElbow.position, rightWrist.position, hip.position ? hip.position : rightShoulder.position).toFixed(1);
+                const rightAngle3 = calculateAngle(rightShoulder.position, rightWrist.position, hip.position ? hip.position : rightShoulder.position).toFixed(1);
+
+                document.getElementById('rightShoulderAngles').innerText = `Right Shoulder Angles: ${rightAngle1}°, ${rightAngle2}°, ${rightAngle3}°`;
+            } else {
+                document.getElementById('rightShoulderAngles').innerText = 'Right Shoulder Angles: Not Detected';
+            }
+        }
+
+        async function detectPose() {
+            const net = await posenet.load();
+            video.play();
+            setInterval(async () => {
+                const pose = await net.estimateSinglePose(video, {
+                    flipHorizontal: false
+                });
+                drawSkeleton(pose.keypoints);
+                updateResults(pose.keypoints); // Update the results display
+            }, 1000);
+        }
+
+        video.addEventListener('loadeddata', detectPose);
+    </script>
+</body>
+</html>

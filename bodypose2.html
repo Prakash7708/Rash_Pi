@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoseNet Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        canvas {
+            border: 1px solid black;
+            position: relative;
+        }
+        #results {
+            display: flex;
+            flex-direction: column;
+            margin-left: 20px; /* Space between canvas and results */
+        }
+        .result-item {
+            margin: 5px 0; /* Spacing between each result */
+        }
+    </style>
+</head>
+<body>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="output" width="640" height="480"></canvas>
+    <div id="results">
+        <div class="result-item" id="headUpDown">Head Up/Down Motor: 0%</div>
+        <div class="result-item" id="headRotation">Head Rotation Motor: 0%</div>
+        <div class="result-item" id="shoulder">Shoulder Motor Rotation: 0%</div>
+        <div class="result-item" id="elbow">Elbow Motor Rotation: 0%</div>
+        <div class="result-item" id="hip">Hip Motor Rotation: 0%</div>
+    </div>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('output');
+        const ctx = canvas.getContext('2d');
+
+        // Set up video stream
+        navigator.mediaDevices.getUserMedia({
+            video: true
+        }).then(stream => {
+            video.srcObject = stream;
+        });
+
+        // Function to draw the skeleton
+        function drawSkeleton(keypoints) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawings
+
+            // Draw keypoints
+            keypoints.forEach(({ score, position }) => {
+                if (score > 0.5) { // Only draw keypoints with a score above 0.5
+                    ctx.beginPath();
+                    ctx.arc(position.x, position.y, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'red';
+                    ctx.fill();
+                }
+            });
+
+            // Draw skeleton lines between keypoints
+            const adjacentKeyPoints = posenet.getAdjacentKeyPoints(keypoints, 0.5);
+            adjacentKeyPoints.forEach(([a, b]) => {
+                if (a.score > 0.5 && b.score > 0.5) {
+                    ctx.beginPath();
+                    ctx.moveTo(a.position.x, a.position.y);
+                    ctx.lineTo(b.position.x, b.position.y);
+                    ctx.strokeStyle = 'blue';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            });
+        }
+
+        // Function to update the results display
+        function updateResults(keypoints) {
+            const head = keypoints.find(kp => kp.part === 'nose');
+            const shoulder = keypoints.find(kp => kp.part === 'leftShoulder');
+            const elbow = keypoints.find(kp => kp.part === 'leftElbow');
+            const hip = keypoints.find(kp => kp.part === 'leftHip');
+
+            // Update Head Up/Down Motor
+            if (head) {
+                const headUpDown = ((head.position.y / canvas.height) * 100).toFixed(1); // Up/Down percentage
+                document.getElementById('headUpDown').innerText = `Head Up/Down Motor: ${headUpDown}%`;
+            } else {
+                document.getElementById('headUpDown').innerText = 'Head Up/Down Motor: Not Detected';
+            }
+
+            // Update Head Rotation Motor (using X position for rotation)
+            if (head) {
+                const headRotation = ((head.position.x / canvas.width) * 100).toFixed(1); // Rotation percentage
+                document.getElementById('headRotation').innerText = `Head Rotation Motor: ${headRotation}%`;
+            } else {
+                document.getElementById('headRotation').innerText = 'Head Rotation Motor: Not Detected';
+            }
+
+            // Update Shoulder Rotation
+            if (shoulder) {
+                document.getElementById('shoulder').innerText = `Shoulder Motor Rotation: ${shoulder.score > 0.5 ? (shoulder.position.y / canvas.height * 100).toFixed(1) : 'Not Detected'}`;
+            } else {
+                document.getElementById('shoulder').innerText = 'Shoulder Motor Rotation: Not Detected';
+            }
+
+            // Update Elbow Rotation
+            if (elbow) {
+                document.getElementById('elbow').innerText = `Elbow Motor Rotation: ${elbow.score > 0.5 ? (elbow.position.y / canvas.height * 100).toFixed(1) : 'Not Detected'}`;
+            } else {
+                document.getElementById('elbow').innerText = 'Elbow Motor Rotation: Not Detected';
+            }
+
+            // Update Hip Rotation
+            if (hip) {
+                document.getElementById('hip').innerText = `Hip Motor Rotation: ${hip.score > 0.5 ? (hip.position.y / canvas.height * 100).toFixed(1) : 'Not Detected'}`;
+            } else {
+                document.getElementById('hip').innerText = 'Hip Motor Rotation: Not Detected';
+            }
+        }
+
+        async function detectPose() {
+            const net = await posenet.load();
+            video.play();
+            setInterval(async () => {
+                const pose = await net.estimateSinglePose(video, {
+                    flipHorizontal: false
+                });
+                drawSkeleton(pose.keypoints);
+                updateResults(pose.keypoints); // Update the results display
+            }, 1000);
+        }
+
+        video.addEventListener('loadeddata', detectPose);
+    </script>
+</body>
+</html>

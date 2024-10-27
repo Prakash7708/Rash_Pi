@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoseNet Shoulder Angle Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        canvas {
+            border: 1px solid black;
+            position: relative;
+        }
+        #results {
+            display: flex;
+            flex-direction: column;
+            margin-left: 20px; /* Space between canvas and results */
+        }
+        .result-item {
+            margin: 5px 0; /* Spacing between each result */
+        }
+    </style>
+</head>
+<body>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="output" width="640" height="480"></canvas>
+    <div id="results">
+        <div class="result-item" id="angleXLeft">Left Angle X: 0°</div>
+        <div class="result-item" id="angleYLeft">Left Angle Y: 0°</div>
+        <div class="result-item" id="angleZLeft">Left Angle Z: 0°</div>
+        <div class="result-item" id="angleXRight">Right Angle X: 0°</div>
+        <div class="result-item" id="angleYRight">Right Angle Y: 0°</div>
+        <div class="result-item" id="angleZRight">Right Angle Z: 0°</div>
+    </div>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('output');
+        const ctx = canvas.getContext('2d');
+
+        // Set up video stream
+        navigator.mediaDevices.getUserMedia({
+            video: true
+        }).then(stream => {
+            video.srcObject = stream;
+        });
+
+        // Function to draw the skeleton
+        function drawSkeleton(keypoints) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawings
+
+            // Draw keypoints
+            keypoints.forEach(({ score, position }) => {
+                if (score > 0.5) { // Only draw keypoints with a score above 0.5
+                    ctx.beginPath();
+                    ctx.arc(position.x, position.y, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'red';
+                    ctx.fill();
+                }
+            });
+
+            // Draw skeleton lines between keypoints
+            const adjacentKeyPoints = posenet.getAdjacentKeyPoints(keypoints, 0.5);
+            adjacentKeyPoints.forEach(([a, b]) => {
+                if (a.score > 0.5 && b.score > 0.5) {
+                    ctx.beginPath();
+                    ctx.moveTo(a.position.x, a.position.y);
+                    ctx.lineTo(b.position.x, b.position.y);
+                    ctx.strokeStyle = 'blue';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            });
+        }
+
+        // Function to convert radians to degrees
+        function toDegrees(radians) {
+            return radians * (180 / Math.PI);
+        }
+
+        // Function to update the results display for shoulder angles
+        function updateShoulderAngles(keypoints) {
+            // Left shoulder calculations
+            const leftShoulder = keypoints.find(kp => kp.part === 'leftShoulder');
+            const leftElbow = keypoints.find(kp => kp.part === 'leftElbow');
+            const leftHip = keypoints.find(kp => kp.part === 'leftHip');
+
+            if (leftShoulder && leftElbow && leftHip) {
+                const leftShoulderToElbow = {
+                    x: leftElbow.position.x - leftShoulder.position.x,
+                    y: leftElbow.position.y - leftShoulder.position.y
+                };
+
+                const leftShoulderToHip = {
+                    x: leftHip.position.x - leftShoulder.position.x,
+                    y: leftHip.position.y - leftShoulder.position.y
+                };
+
+                const leftAngleX = Math.atan2(leftShoulderToHip.y, leftShoulderToHip.x);
+                const leftAngleY = Math.atan2(leftShoulderToElbow.y, leftShoulderToElbow.x);
+                const leftAngleZ = Math.atan2(leftShoulder.position.y - leftHip.position.y, leftShoulder.position.x - leftHip.position.x);
+
+                // Convert to degrees
+                const leftAngleXDeg = toDegrees(leftAngleX).toFixed(2);
+                const leftAngleYDeg = toDegrees(leftAngleY).toFixed(2);
+                const leftAngleZDeg = toDegrees(leftAngleZ).toFixed(2);
+
+                // Update the results display for left shoulder
+                document.getElementById('angleXLeft').innerText = `Left Angle X: ${leftAngleXDeg}°`;
+                document.getElementById('angleYLeft').innerText = `Left Angle Y: ${leftAngleYDeg}°`;
+                document.getElementById('angleZLeft').innerText = `Left Angle Z: ${leftAngleZDeg}°`;
+            } else {
+                document.getElementById('angleXLeft').innerText = 'Left Angle X: Not Detected';
+                document.getElementById('angleYLeft').innerText = 'Left Angle Y: Not Detected';
+                document.getElementById('angleZLeft').innerText = 'Left Angle Z: Not Detected';
+            }
+
+            // Right shoulder calculations
+            const rightShoulder = keypoints.find(kp => kp.part === 'rightShoulder');
+            const rightElbow = keypoints.find(kp => kp.part === 'rightElbow');
+            const rightHip = keypoints.find(kp => kp.part === 'rightHip');
+
+            if (rightShoulder && rightElbow && rightHip) {
+                const rightShoulderToElbow = {
+                    x: rightElbow.position.x - rightShoulder.position.x,
+                    y: rightElbow.position.y - rightShoulder.position.y
+                };
+
+                const rightShoulderToHip = {
+                    x: rightHip.position.x - rightShoulder.position.x,
+                    y: rightHip.position.y - rightShoulder.position.y
+                };
+
+                const rightAngleX = Math.atan2(rightShoulderToHip.y, rightShoulderToHip.x);
+                const rightAngleY = Math.atan2(rightShoulderToElbow.y, rightShoulderToElbow.x);
+                const rightAngleZ = Math.atan2(rightShoulder.position.y - rightHip.position.y, rightShoulder.position.x - rightHip.position.x);
+
+                // Convert to degrees
+                const rightAngleXDeg = toDegrees(rightAngleX).toFixed(2);
+                const rightAngleYDeg = toDegrees(rightAngleY).toFixed(2);
+                const rightAngleZDeg = toDegrees(rightAngleZ).toFixed(2);
+
+                // Update the results display for right shoulder
+                document.getElementById('angleXRight').innerText = `Right Angle X: ${rightAngleXDeg}°`;
+                document.getElementById('angleYRight').innerText = `Right Angle Y: ${rightAngleYDeg}°`;
+                document.getElementById('angleZRight').innerText = `Right Angle Z: ${rightAngleZDeg}°`;
+            } else {
+                document.getElementById('angleXRight').innerText = 'Right Angle X: Not Detected';
+                document.getElementById('angleYRight').innerText = 'Right Angle Y: Not Detected';
+                document.getElementById('angleZRight').innerText = 'Right Angle Z: Not Detected';
+            }
+        }
+
+        async function detectPose() {
+            const net = await posenet.load();
+            video.play();
+            setInterval(async () => {
+                const pose = await net.estimateSinglePose(video, {
+                    flipHorizontal: false
+                });
+                drawSkeleton(pose.keypoints);
+                updateShoulderAngles(pose.keypoints); // Update shoulder angles
+            }, 1000);
+        }
+
+        video.addEventListener('loadeddata', detectPose);
+    </script>
+</body>
+</html>

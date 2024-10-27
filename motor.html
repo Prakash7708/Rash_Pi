@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Webcam Stream</title>
+    <style>
+        .btn {
+            padding: 20px;
+            color: white;
+            background-color: blue;
+            border: none;
+            cursor: pointer;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <button class="btn" id="getRequestBtn">Check Motor Status</button>
+    <div class="status" id="statusDisplay">Motor status: Unknown</div>
+
+    <script>
+        // Function to make a GET request
+        function makeGetRequest() {
+            fetch('http://192.168.209.32:5000/api/led')
+                .then(response => response.json()) // Parse JSON response
+                .then(data => {
+                    // Check the response and update the status display
+                    const statusDisplay = document.getElementById('statusDisplay');
+                    if (data.status === "success") {
+                        if (data.isMotorOn) {
+                            statusDisplay.textContent = "Motor status: Running";
+                            statusDisplay.style.color = "green";
+                        } else {
+                            statusDisplay.textContent = "Motor status: Off";
+                            statusDisplay.style.color = "red";
+                        }
+                    } else {
+                        statusDisplay.textContent = "Motor status: Error";
+                        statusDisplay.style.color = "orange";
+                    }
+                })
+                .catch(error => {
+                    // Handle error
+                    const statusDisplay = document.getElementById('statusDisplay');
+                    statusDisplay.textContent = "Motor status: Error fetching data";
+                    statusDisplay.style.color = "orange";
+                    console.error("Error:", error);
+                });
+        }
+
+        // Add click event listener to the button
+        document.getElementById('getRequestBtn').addEventListener('click', makeGetRequest);
+    </script>
+</body>
+</html>

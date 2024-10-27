@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoseNet Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        canvas {
+            border: 1px solid black;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="output" width="640" height="480"></canvas>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('output');
+        const ctx = canvas.getContext('2d');
+
+        // Set up video stream
+        navigator.mediaDevices.getUserMedia({
+            video: true
+        }).then(stream => {
+            video.srcObject = stream;
+        });
+
+        // Function to draw the skeleton
+        function drawSkeleton(keypoints) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawings
+
+            // Draw keypoints
+            keypoints.forEach(({ score, position }) => {
+                if (score > 0.5) { // Only draw keypoints with a score above 0.5
+                    ctx.beginPath();
+                    ctx.arc(position.x, position.y, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'red';
+                    ctx.fill();
+                }
+            });
+
+            // Draw skeleton lines between keypoints
+            const adjacentKeyPoints = posenet.getAdjacentKeyPoints(keypoints, 0.5);
+            adjacentKeyPoints.forEach(([a, b]) => {
+                if (a.score > 0.5 && b.score > 0.5) {
+                    ctx.beginPath();
+                    ctx.moveTo(a.position.x, a.position.y);
+                    ctx.lineTo(b.position.x, b.position.y);
+                    ctx.strokeStyle = 'blue';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            });
+        }
+
+        async function detectPose() {
+            const net = await posenet.load();
+            video.play();
+            setInterval(async () => {
+                const pose = await net.estimateSinglePose(video, {
+                    flipHorizontal: false
+                });
+                drawSkeleton(pose.keypoints);
+            }, 1000);
+        }
+
+        video.addEventListener('loadeddata', detectPose);
+    </script>
+</body>
+</html>
