@@ -67,30 +67,35 @@ function motor2Stop() {
 
 exports.testReq = async function (req, res) {
     try {
-        // Toggle motor states for Motor 1 and Motor 2
-        isMotor1On = !isMotor1On;
-        isMotor2On = !isMotor2On;
+        const { motor } = req.query; // Check which motor to control from query parameter
 
-        // Control Motor 1 based on state
-        if (isMotor1On) {
-            motor1Forward();
-            console.log("Motor 1 on");
-        } else {
-            motor1Stop();
-            console.log("Motor 1 off");
-        }
-
-        // Control Motor 2 based on state
-        if (isMotor2On) {
-            motor2Forward();
-            console.log("Motor 2 on");
-        } else {
-            motor2Stop();
-            console.log("Motor 2 off");
+        if (motor === '1') {
+            // Toggle Motor 1 state
+            isMotor1On = !isMotor1On;
+            if (isMotor1On) {
+                motor1Forward();
+                console.log("Motor 1 on");
+            } else {
+                motor1Stop();
+                console.log("Motor 1 off");
+            }
+        } else if (motor === '2') {
+            // Toggle Motor 2 state
+            isMotor2On = !isMotor2On;
+            if (isMotor2On) {
+                motor2Forward();
+                console.log("Motor 2 on");
+            } else {
+                motor2Stop();
+                console.log("Motor 2 off");
+            }
         }
 
         // Send response with both motor statuses
-        res.status(200).json({ status: "success", motorStatus: { isMotor1On, isMotor2On } });
+        res.status(200).json({
+            status: "success",
+            motorStatus: { isMotor1On, isMotor2On }
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json({ status: "failure", message: "Failed to control GPIO pins" });
