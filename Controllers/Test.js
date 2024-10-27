@@ -32,8 +32,8 @@ const in1 = new Gpio(22, 'out'); // IN1 on L298N for Motor 1
 const in2 = new Gpio(27, 'out'); // IN2 on L298N for Motor 1
 
 // Define GPIO pins for Motor 2
-const in3 = new Gpio(17, 'out'); // IN3 for Motor 2
-const in4 = new Gpio(18, 'out'); // IN4 for Motor 2
+const in3 = new Gpio(23, 'out'); // IN3 for Motor 2
+const in4 = new Gpio(24, 'out'); // IN4 for Motor 2
 
 // Variables to track motor states
 let isMotor1On = false;
