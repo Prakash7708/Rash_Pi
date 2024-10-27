@@ -9,6 +9,7 @@
             background-color: blue;
             border: none;
             cursor: pointer;
+            margin-right: 10px;
         }
 
         .status {
@@ -18,41 +19,70 @@
     </style>
 </head>
 <body>
-    <button class="btn" id="getRequestBtn">Check Motor Status</button>
-    <div class="status" id="statusDisplay">Motor status: Unknown</div>
+    <button class="btn" id="getRequestBtn1">Check Motor 1 Status</button>
+    <button class="btn" id="getRequestBtn2">Check Motor 2 Status</button>
+
+    <div class="status" id="statusDisplay1">Motor 1 status: Unknown</div>
+    <div class="status" id="statusDisplay2">Motor 2 status: Unknown</div>
 
     <script>
-        // Function to make a GET request
-        function makeGetRequest() {
-            fetch('http://192.168.209.32:5000/api/led')
-                .then(response => response.json()) // Parse JSON response
+        // Function to check the status of Motor 1
+        function checkMotor1Status() {
+            fetch('http://192.168.114.32:5000/api/led')
+                .then(response => response.json())
                 .then(data => {
-                    // Check the response and update the status display
-                    const statusDisplay = document.getElementById('statusDisplay');
+                    const statusDisplay1 = document.getElementById('statusDisplay1');
                     if (data.status === "success") {
-                        if (data.isMotorOn) {
-                            statusDisplay.textContent = "Motor status: Running";
-                            statusDisplay.style.color = "green";
+                        if (data.isMotor1On) {
+                            statusDisplay1.textContent = "Motor 1 status: Running";
+                            statusDisplay1.style.color = "green";
                         } else {
-                            statusDisplay.textContent = "Motor status: Off";
-                            statusDisplay.style.color = "red";
+                            statusDisplay1.textContent = "Motor 1 status: Off";
+                            statusDisplay1.style.color = "red";
                         }
                     } else {
-                        statusDisplay.textContent = "Motor status: Error";
-                        statusDisplay.style.color = "orange";
+                        statusDisplay1.textContent = "Motor 1 status: Error";
+                        statusDisplay1.style.color = "orange";
                     }
                 })
                 .catch(error => {
-                    // Handle error
-                    const statusDisplay = document.getElementById('statusDisplay');
-                    statusDisplay.textContent = "Motor status: Error fetching data";
-                    statusDisplay.style.color = "orange";
+                    const statusDisplay1 = document.getElementById('statusDisplay1');
+                    statusDisplay1.textContent = "Motor 1 status: Error fetching data";
+                    statusDisplay1.style.color = "orange";
                     console.error("Error:", error);
                 });
         }
 
-        // Add click event listener to the button
-        document.getElementById('getRequestBtn').addEventListener('click', makeGetRequest);
+        // Function to check the status of Motor 2
+        function checkMotor2Status() {
+            fetch('http://192.168.114.32:5000/api/led')
+                .then(response => response.json())
+                .then(data => {
+                    const statusDisplay2 = document.getElementById('statusDisplay2');
+                    if (data.status === "success") {
+                        if (data.isMotor2On) {
+                            statusDisplay2.textContent = "Motor 2 status: Running";
+                            statusDisplay2.style.color = "green";
+                        } else {
+                            statusDisplay2.textContent = "Motor 2 status: Off";
+                            statusDisplay2.style.color = "red";
+                        }
+                    } else {
+                        statusDisplay2.textContent = "Motor 2 status: Error";
+                        statusDisplay2.style.color = "orange";
+                    }
+                })
+                .catch(error => {
+                    const statusDisplay2 = document.getElementById('statusDisplay2');
+                    statusDisplay2.textContent = "Motor 2 status: Error fetching data";
+                    statusDisplay2.style.color = "orange";
+                    console.error("Error:", error);
+                });
+        }
+
+        // Add event listeners for each button
+        document.getElementById('getRequestBtn1').addEventListener('click', checkMotor1Status);
+        document.getElementById('getRequestBtn2').addEventListener('click', checkMotor2Status);
     </script>
 </body>
 </html>
