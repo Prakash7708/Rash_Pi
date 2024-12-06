@@ -37,8 +37,6 @@ const in3 = new Gpio(23, 'out'); // IN3 for Motor 2
 const in4 = new Gpio(24, 'out'); // IN4 for Motor 2
 
 
-
-// Function to set motor speed (simulated PWM)
 let pwmInterval; // Declare pwmInterval globally for stopping later
 
 function setMotorSpeed(speed) {
@@ -54,8 +52,10 @@ function setMotorSpeed(speed) {
     // Start the PWM interval
     pwmInterval = setInterval(() => {
         ena.writeSync(1); // Turn ENA on
-        setTimeout(() => ena.writeSync(0), onTime); // Turn ENA off after onTime
-    }, 10);
+        setTimeout(() => {
+            ena.writeSync(0); // Turn ENA off
+        }, onTime); // Off after onTime
+    }, onTime + offTime); // Total cycle duration (10 ms)
 }
 
 // Function to stop the motor
@@ -78,7 +78,7 @@ function motor1Forward() {
     console.log('Motor 1 forward');
     in1.writeSync(1);
     in2.writeSync(0);
-    setMotorSpeed(30);
+    setMotorSpeed(50);
 }
 
 // Function to stop Motor 1
