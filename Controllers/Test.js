@@ -30,7 +30,7 @@ const { Gpio } = require('onoff');
 // Define GPIO pins for Motor 1
 const in1 = new Gpio(22, 'out'); // IN1 on L298N for Motor 1
 const in2 = new Gpio(27, 'out'); // IN2 on L298N for Motor 1
-const ena = new Gpio(25, 'out'); // IN2 on L298N for Motor 1
+//const ena = new Gpio(25, 'out'); // IN2 on L298N for Motor 1
 
 // Define GPIO pins for Motor 2
 const in3 = new Gpio(23, 'out'); // IN3 for Motor 2
@@ -78,14 +78,14 @@ function motor1Forward() {
     console.log('Motor 1 forward');
     in1.writeSync(1);
     in2.writeSync(0);
-    setMotorSpeed(30);
+    //setMotorSpeed(30);
 }
 
 // Function to stop Motor 1
 function motor1Stop() {
     in1.writeSync(0);
     in2.writeSync(0);
-    stopMotor()
+    //stopMotor()
 }
 
 // Function to drive Motor 2 forward
