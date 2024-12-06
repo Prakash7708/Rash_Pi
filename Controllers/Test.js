@@ -37,10 +37,20 @@ const in3 = new Gpio(23, 'out'); // IN3 for Motor 2
 const in4 = new Gpio(24, 'out'); // IN4 for Motor 2
 
 
-// Function to set motor speed (0-100%)
+
+// Function to set motor speed (simulated PWM)
 function setMotorSpeed(speed) {
-    const dutyCycle = Math.max(0, Math.min(speed, 100)) * 255 / 100; // Convert 0-100% to 0-255
-    ena.pwmWrite(dutyCycle); // Apply PWM to the ENA pin
+    const dutyCycle = Math.max(0, Math.min(speed, 100)); // Limit speed to 0-100%
+    const onTime = (dutyCycle / 100) * 10; // ON time in milliseconds
+    const offTime = 10 - onTime; // OFF time in milliseconds
+
+    let pwmInterval = setInterval(() => {
+        ena.writeSync(1); // Turn ENA on
+        setTimeout(() => ena.writeSync(0), onTime); // Turn ENA off after onTime
+    }, 10);
+
+    // Optional: Stop PWM after a set time
+    setTimeout(() => clearInterval(pwmInterval), 5000); // Stop after 5 seconds
 }
 
 // Variables to track motor states
