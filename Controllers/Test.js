@@ -78,7 +78,7 @@ function motor1Forward() {
     console.log('Motor 1 forward');
     in1.writeSync(1);
     in2.writeSync(0);
-    setMotorSpeed(50);
+    setMotorSpeed(30);
 }
 
 // Function to stop Motor 1
