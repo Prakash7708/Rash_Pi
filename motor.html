@@ -19,50 +19,27 @@
     </style>
 </head>
 <body>
-    <button class="btn" id="getRequestBtn1">Check Motor 1 Status</button>
-    <button class="btn" id="getRequestBtn2">Check Motor 2 Status</button>
-
-    <div class="status" id="statusDisplay1">Motor 1 status: Unknown</div>
-    <div class="status" id="statusDisplay2">Motor 2 status: Unknown</div>
-
+    <button class="btn" id="getRequestBtn1">Toggle Motor 1 Status</button>
+    <button class="btn" id="getRequestBtn2">Toggle Motor 2 Status</button>
+    
     <script>
-        // Function to check the status of Motor 1
-        function checkMotor1Status() {
-            fetch('http://192.168.114.32:5000/api/led')
+        function checkMotorStatus(motorNumber) {
+            fetch(`http://192.168.102.32:5000/api/led?motor=${motorNumber}`)
                 .then(response => response.json())
                 .then(data => {
                     const statusDisplay1 = document.getElementById('statusDisplay1');
+                    const statusDisplay2 = document.getElementById('statusDisplay2');
+    
                     if (data.status === "success") {
-                        // Use the specific key for Motor 1 status
-                        if (data.isMotor1On) {
+                        if (data.motorStatus.isMotor1On) {
                             statusDisplay1.textContent = "Motor 1 status: Running";
                             statusDisplay1.style.color = "green";
                         } else {
                             statusDisplay1.textContent = "Motor 1 status: Off";
                             statusDisplay1.style.color = "red";
                         }
-                    } else {
-                        statusDisplay1.textContent = "Motor 1 status: Error";
-                        statusDisplay1.style.color = "orange";
-                    }
-                })
-                .catch(error => {
-                    const statusDisplay1 = document.getElementById('statusDisplay1');
-                    statusDisplay1.textContent = "Motor 1 status: Error fetching data";
-                    statusDisplay1.style.color = "orange";
-                    console.error("Error:", error);
-                });
-        }
-
-        // Function to check the status of Motor 2
-        function checkMotor2Status() {
-            fetch('http://192.168.114.32:5000/api/led')
-                .then(response => response.json())
-                .then(data => {
-                    const statusDisplay2 = document.getElementById('statusDisplay2');
-                    if (data.status === "success") {
-                        // Use the specific key for Motor 2 status
-                        if (data.isMotor2On) {
+    
+                        if (data.motorStatus.isMotor2On) {
                             statusDisplay2.textContent = "Motor 2 status: Running";
                             statusDisplay2.style.color = "green";
                         } else {
@@ -70,21 +47,20 @@
                             statusDisplay2.style.color = "red";
                         }
                     } else {
+                        statusDisplay1.textContent = "Motor 1 status: Error";
+                        statusDisplay1.style.color = "orange";
                         statusDisplay2.textContent = "Motor 2 status: Error";
                         statusDisplay2.style.color = "orange";
                     }
                 })
                 .catch(error => {
-                    const statusDisplay2 = document.getElementById('statusDisplay2');
-                    statusDisplay2.textContent = "Motor 2 status: Error fetching data";
-                    statusDisplay2.style.color = "orange";
                     console.error("Error:", error);
                 });
         }
-
-        // Add event listeners for each button
-        document.getElementById('getRequestBtn1').addEventListener('click', checkMotor1Status);
-        document.getElementById('getRequestBtn2').addEventListener('click', checkMotor2Status);
+    
+        document.getElementById('getRequestBtn1').addEventListener('click', () => checkMotorStatus(1));
+        document.getElementById('getRequestBtn2').addEventListener('click', () => checkMotorStatus(2));
     </script>
+    
 </body>
 </html>
