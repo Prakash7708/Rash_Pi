@@ -24,7 +24,9 @@
     
     <script>
         function checkMotorStatus(motorNumber) {
-            fetch(`http://192.168.102.32:5000/api/led?motor=${motorNumber}`)
+            fetch(`http://192.168.56.33:5000/api/led?motor=${motorNumber}`)
+          // fetch(`http://152.58.220.191:5000/api/led?motor=${motorNumber}`)
+           
                 .then(response => response.json())
                 .then(data => {
                     const statusDisplay1 = document.getElementById('statusDisplay1');
